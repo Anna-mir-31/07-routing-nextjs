@@ -1,24 +1,24 @@
 // app/layout.tsx
-import TanStackProvider from '@/components/TanStackProvider/TanStackProvider';
-import Header from '@/components/Header/Header';
-import Footer from '@/components/Footer/Footer';
-import './globals.css';
-import type { Metadata } from 'next';
+import type { Metadata } from "next";
+import "@/app/globals.css";
+import Header from "@/components/Header/Header";
+import Footer from "@/components/Footer/Footer";
+import { ReactQueryProvider } from "@/components/providers/ReactQueryProvider";
 
 export const metadata: Metadata = {
-  title: 'NoteHub',
-  description: 'NoteHub on Next.js',
+  title: "NoteHub",
+  description: "NoteHub — routing homework",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body>
-        <TanStackProvider>
+        <ReactQueryProvider>
           <Header />
-          <main>{children}</main>
+          {children}
           <Footer />
-        </TanStackProvider>
+        </ReactQueryProvider>
       </body>
     </html>
   );

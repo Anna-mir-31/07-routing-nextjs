@@ -1,65 +1,13 @@
-// components/Pagination/Pagination.tsx
-'use client';
+"use client";
+import css from "./Pagination.module.css";
 
-import React from 'react';
-import css from './Pagination.module.css';
 
-type Props = {
-  pageCount: number;
-  forcePage: number; // 0-based
-  onPageChange: (arg: { selected: number }) => void;
-};
-
-const Pagination: React.FC<Props> = ({ pageCount, forcePage, onPageChange }) => {
-  const pages = Array.from({ length: pageCount }, (_, i) => i);
-
-  const goPrev = () => {
-    if (forcePage > 0) {
-      onPageChange({ selected: forcePage - 1 });
-    }
-  };
-
-  const goNext = () => {
-    if (forcePage < pageCount - 1) {
-      onPageChange({ selected: forcePage + 1 });
-    }
-  };
-
-  return (
-    <ul className={css.pagination}>
-      {/* Prev arrow */}
-      <li
-        className={forcePage === 0 ? css.disabled : undefined}
-        onClick={goPrev}
-        aria-disabled={forcePage === 0}
-      >
-        <a>←</a>
-      </li>
-
-      {pages.map((p) => {
-        const active = p === forcePage;
-        return (
-          <li
-            key={p}
-            className={active ? css.active : undefined}
-            onClick={() => onPageChange({ selected: p })}
-            aria-current={active ? 'page' : undefined}
-          >
-            <a>{p + 1}</a>
-          </li>
-        );
-      })}
-
-      {/* Next arrow */}
-      <li
-        className={forcePage === pageCount - 1 ? css.disabled : undefined}
-        onClick={goNext}
-        aria-disabled={forcePage === pageCount - 1}
-      >
-        <a>→</a>
-      </li>
-    </ul>
-  );
-};
-
-export default Pagination;
+export default function Pagination({ page, totalPages, onChange }: { page: number; totalPages: number; onChange: (p: number) => void }) {
+return (
+<div className={css.pagination}>
+<button className={css.pageBtn} onClick={() => onChange(Math.max(1, page - 1))} disabled={page === 1}>Prev</button>
+<span className={css.pageInfo}>{page} / {totalPages}</span>
+<button className={css.pageBtn} onClick={() => onChange(Math.min(totalPages, page + 1))} disabled={page === totalPages}>Next</button>
+</div>
+);
+}

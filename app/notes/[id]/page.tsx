@@ -1,38 +1,40 @@
 // app/notes/[id]/page.tsx
-import { notFound } from 'next/navigation';
-import { fetchNoteById } from '@/lib/api';
-import type { Metadata } from 'next';
-import NoteDetailsClient from './NoteDetails.client';
+"use client";
 
-interface PageProps {
-  params: Promise<{ id: string }>; // changed: params тепер Promise
-}
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import NotePreview from "@/components/NotePreview/NotePreview";
+import { getNoteById } from "@/lib/api/notes";
+import type { Note } from "@/types/note";
+import css from "./NoteDetails.module.css";
 
-export default async function NoteDetailsPage({ params }: PageProps) {
-  const { id } = await params; // changed: додано await
+export default function NoteDetailsPage() {
+  const params = useParams<{ id: string }>();
+  const [note, setNote] = useState<Note | null>(null);
+  const [err, setErr] = useState<string | null>(null);
 
-  try {
-    await fetchNoteById(id);
-    return <NoteDetailsClient id={id} />;
-  } catch (e: any) {
-    if (e?.response?.status === 404) notFound();
-    throw e;
+  useEffect(() => {
+    (async () => {
+      try {
+        const data = await getNoteById(params.id);
+        setNote(data);
+      } catch (e: any) {
+        setErr(e?.message ?? "Failed to load note");
+      }
+    })();
+  }, [params.id]);
+
+  if (err) {
+    return <div className={css.error}>{err}</div>;
   }
-}
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { id } = await params; // changed: додано await
-
-  try {
-    const note = await fetchNoteById(id);
-    return {
-      title: note.title ? `${note.title} – NoteHub` : 'Note – NoteHub',
-      description: note.content?.slice(0, 140) ?? 'Note details',
-    };
-  } catch {
-    return {
-      title: 'Note – Not found',
-      description: 'The note was not found',
-    };
+  if (!note) {
+    return <div className={css.loading}>Loading…</div>;
   }
+
+  return (
+    <div className={css.container}>
+      <NotePreview note={note} />
+    </div>
+  );
 }

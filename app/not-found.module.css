@@ -1,0 +1,14 @@
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 80px 24px;
+}
+
+.title {
+    font-size: 36px;
+    margin: 0 0 12px;
+}
+
+.description {
+    opacity: 0.8;
+}

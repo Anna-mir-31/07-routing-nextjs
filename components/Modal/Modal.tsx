@@ -1,33 +1,29 @@
-'use client';
+"use client";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
+import css from "./Modal.module.css";
 
-import { PropsWithChildren, useEffect } from 'react';
-import css from './Modal.module.css';
+export default function Modal({ children, onClose }: { children: React.ReactNode; onClose: () => void }) {
+  const [mounted, setMounted] = useState(false);
 
-type Props = PropsWithChildren<{
-  onClose: () => void;
-}>;
-
-export default function NoteModal({ onClose, children }: Props) {
   useEffect(() => {
-    const onEsc = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
-    window.addEventListener('keydown', onEsc);
-    // блокування скролу під модалкою
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-
-    return () => {
-      window.removeEventListener('keydown', onEsc);
-      document.body.style.overflow = prev;
+    setMounted(true);
+    const onKey = (e: KeyboardEvent) => { 
+      if (e.key === "Escape") onClose(); 
     };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
   }, [onClose]);
 
-  const onBackdrop = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (e.target === e.currentTarget) onClose();
-  };
+  if (!mounted) return null;
 
-  return (
-    <div className={css.backdrop} onClick={onBackdrop} role="dialog" aria-modal="true">
-      <div className={css.modal}>{children}</div>
-    </div>
+  return createPortal(
+    <div className={css.overlay} onClick={onClose} role="dialog" aria-modal="true">
+      <div className={css.modal} onClick={(e) => e.stopPropagation()}>
+        <button className={css.closeBtn} onClick={onClose} aria-label="Close">×</button>
+        {children}
+      </div>
+    </div>,
+    document.body
   );
 }

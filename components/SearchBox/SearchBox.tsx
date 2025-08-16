@@ -1,23 +1,19 @@
-// components/SearchBox/SearchBox.tsx
-'use client';
+"use client";
+import css from "./SearchBox.module.css";
 
-import React from 'react';
-import css from './SearchBox.module.css';
 
-type Props = {
-  value: string;
-  onSearch: (value: string) => void;
-};
-
-const SearchBox: React.FC<Props> = ({ value, onSearch }) => {
-  return (
-    <input
-      className={css.input}
-      placeholder="Search notes"
-      value={value}
-      onChange={(e) => onSearch(e.target.value)}
-    />
-  );
-};
-
-export default SearchBox;
+export default function SearchBox({ onSearch }: { onSearch: (q: string) => void }) {
+return (
+<form
+className={css.form}
+onSubmit={(e) => {
+e.preventDefault();
+const fd = new FormData(e.currentTarget as HTMLFormElement);
+onSearch(String(fd.get("query") || ""));
+}}
+>
+<input name="query" className={css.input} placeholder="Search notes…" />
+<button className={css.button} type="submit">Search</button>
+</form>
+);
+}
