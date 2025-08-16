@@ -1,15 +1,8 @@
-import type { ReactNode } from "react";
 import css from "./layout.module.css";
 
-export default function NotesFilterLayout({
-  children,
-  sidebar,
-  modal,
-}: {
-  children: ReactNode;
-  sidebar: ReactNode;
-  modal: ReactNode;
-}) {
+export default function Layout(props: any) {
+  const { children, sidebar, modal } = props;
+  
   return (
     <section className={css.container}>
       <aside className={css.sidebar}>{sidebar}</aside>

@@ -1,12 +1,6 @@
-import { ReactNode } from "react";
-
-export default function NotesLayout({
-  children,
-  modal,
-}: {
-  children: ReactNode;
-  modal: ReactNode;
-}) {
+export default function NotesLayout(props: any) {
+  const { children, modal } = props;
+  
   return (
     <>
       {children}
