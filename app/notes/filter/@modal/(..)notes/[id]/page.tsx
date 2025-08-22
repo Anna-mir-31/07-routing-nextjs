@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import Modal from "../../../../../components/Modal/Modal";
-import NotePreview from "../../../../../components/NotePreview/NotePreview";
-import { getNoteById } from "../../../../../lib/api/notes";
-import type { Note } from "../../../../../types/note";
+import Modal from "@/components/Modal/Modal";
+import NotePreview from "@/components/NotePreview/NotePreview";
+import { getNoteById } from "@/lib/api/notes";
+import type { Note } from "@/types/note";
 
 export default function InterceptedNoteModal() {
   const router = useRouter();
