@@ -6,7 +6,6 @@ import { useParams } from "next/navigation";
 import NotePreview from "@/components/NotePreview/NotePreview";
 import { getNoteById } from "@/lib/api/notes";
 import type { Note } from "@/types/note";
-import css from "./NoteDetails.module.css";
 
 export default function NoteDetailsPage() {
   const params = useParams<{ id: string }>();
@@ -25,15 +24,38 @@ export default function NoteDetailsPage() {
   }, [params.id]);
 
   if (err) {
-    return <div className={css.error}>{err}</div>;
+    return (
+      <div style={{ 
+        textAlign: 'center', 
+        padding: '40px',
+        color: '#dc3545',
+        backgroundColor: '#f8d7da',
+        borderRadius: '8px',
+        margin: '20px'
+      }}>
+        {err}
+      </div>
+    );
   }
 
   if (!note) {
-    return <div className={css.loading}>Loading…</div>;
+    return (
+      <div style={{ 
+        textAlign: 'center', 
+        padding: '40px',
+        color: '#6c757d'
+      }}>
+        Loading…
+      </div>
+    );
   }
 
   return (
-    <div className={css.container}>
+    <div style={{ 
+      maxWidth: '800px', 
+      margin: '0 auto', 
+      padding: '24px' 
+    }}>
       <NotePreview note={note} />
     </div>
   );
