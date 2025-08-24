@@ -1,113 +1,132 @@
-"use client";
-import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createNote } from "../../lib/api/notes";
-import css from "./NoteForm.module.css";
+'use client';
 
-const TAGS = ["Personal", "Work", "Ideas", "Learning", "Shopping", "Todo"];
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { Formik, Form, Field, ErrorMessage } from 'formik';
+import * as Yup from 'yup';
+import { createNote } from '../../lib/api/notes';
+import type { NoteTag } from '../../types/note';
+import css from './NoteForm.module.css';
 
 interface NoteFormProps {
+  onClose: () => void;
   onSuccess?: () => void;
-  onCancel?: () => void;
 }
 
-export default function NoteForm({ onSuccess, onCancel }: NoteFormProps) {
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [tag, setTag] = useState("");
-  
-  const queryClient = useQueryClient();
-  
-  const createNoteMutation = useMutation({
-    mutationFn: createNote,
+const TAGS: NoteTag[] = ['Todo', 'Work', 'Personal', 'Shopping', 'Meeting'];
+
+const validationSchema = Yup.object({
+  title: Yup.string()
+    .trim()
+    .required('Title is required'),
+  content: Yup.string()
+    .trim()
+    .required('Content is required'),
+  tag: Yup.string()
+    .oneOf(TAGS, 'Invalid tag')
+    .required('Tag is required'),
+});
+
+interface FormValues {
+  title: string;
+  content: string;
+  tag: NoteTag;
+}
+
+export default function NoteForm({ onClose, onSuccess }: NoteFormProps) {
+  const qc = useQueryClient();
+
+  const { mutate, isPending, error } = useMutation({
+    mutationFn: (values: FormValues) => createNote({ 
+      title: values.title.trim(), 
+      content: values.content.trim(), 
+      tag: values.tag 
+    }),
     onSuccess: () => {
-      // Оновлюємо кеш для всіх запитів notes
-      queryClient.invalidateQueries({ queryKey: ["notes"] });
-      // Очищаємо форму
-      setTitle("");
-      setContent("");
-      setTag("");
-      // Викликаємо callback
+      qc.invalidateQueries({ queryKey: ['notes'] });
+      onClose();
       onSuccess?.();
     },
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!title.trim() || !content.trim()) return;
-    
-    createNoteMutation.mutate({
-      title: title.trim(),
-      content: content.trim(),
-      tag: tag || undefined,
-    });
-  };  return (
-    <div>
-      <h2 className={css.title}>Create New Note</h2>
-      <form className={css.form} onSubmit={handleSubmit}>
-        <div className={css.field}>
-          <label className={css.label}>Title</label>
-          <input 
-            className={css.input} 
-            placeholder="Enter title" 
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-          />
-        </div>
-        
-        <div className={css.field}>
-          <label className={css.label}>Tag (optional)</label>
-          <select 
-            className={css.select} 
-            value={tag} 
-            onChange={(e) => setTag(e.target.value)}
-          >
-            <option value="">Select tag</option>
-            {TAGS.map(tagOption => (
-              <option key={tagOption} value={tagOption}>{tagOption}</option>
-            ))}
-          </select>
-        </div>
-        
-        <div className={css.field}>
-          <label className={css.label}>Content</label>
-          <textarea 
-            className={css.textarea} 
-            placeholder="Enter content" 
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            rows={6}
-            required
-          />
-        </div>
-        
-        <div className={css.actions}>
-          <button 
-            className={css.submitButton} 
-            type="submit" 
-            disabled={createNoteMutation.isPending || !title.trim() || !content.trim()}
-          >
-            {createNoteMutation.isPending ? "Saving..." : "Save"}
-          </button>
-          
-          {onCancel && (
-            <button 
-              className={css.cancelButton} 
-              type="button" 
-              onClick={onCancel}
+  const initialValues: FormValues = {
+    title: '',
+    content: '',
+    tag: 'Todo',
+  };
+
+  return (
+    <Formik
+      initialValues={initialValues}
+      validationSchema={validationSchema}
+      onSubmit={(values: FormValues) => mutate(values)}
+    >
+      {() => (
+        <Form className={css.form}>
+          <div className={css.formGroup}>
+            <label htmlFor="title">Title</label>
+            <Field
+              id="title"
+              name="title"
+              className={css.input}
+              type="text"
+              disabled={isPending}
+            />
+            <ErrorMessage name="title" component="span" className={css.error} />
+          </div>
+
+          <div className={css.formGroup}>
+            <label htmlFor="content">Content</label>
+            <Field
+              id="content"
+              name="content"
+              as="textarea"
+              className={css.textarea}
+              rows={6}
+              disabled={isPending}
+            />
+            <ErrorMessage name="content" component="span" className={css.error} />
+          </div>
+
+          <div className={css.formGroup}>
+            <label htmlFor="tag">Tag</label>
+            <Field
+              id="tag"
+              name="tag"
+              as="select"
+              className={css.select}
+              disabled={isPending}
+            >
+              {TAGS.map((t) => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
+              ))}
+            </Field>
+            <ErrorMessage name="tag" component="span" className={css.error} />
+          </div>
+
+          <div className={css.actions}>
+            <button
+              type="button"
+              className={css.cancelButton}
+              onClick={onClose}
+              disabled={isPending}
             >
               Cancel
             </button>
-          )}
-        </div>
-        
-        {createNoteMutation.isError && (
-          <div className={css.error}>
-            Failed to create note. Please try again.
+            
+            <button type="submit" className={css.submitButton} disabled={isPending}>
+              {isPending ? 'Creating…' : 'Create note'}
+            </button>
           </div>
-        )}
-      </form>
-    </div>
+
+          {error && (
+            <p className={css.error} role="alert">
+              {(error as Error).message || 'Something went wrong'}
+            </p>
+          )}
+        </Form>
+      )}
+    </Formik>
   );
 }

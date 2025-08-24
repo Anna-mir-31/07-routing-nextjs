@@ -120,7 +120,7 @@ export default function NotesClient({ tag, selectedTag }: NotesClientProps) {
       {isCreateModalOpen && (
         <Modal onClose={() => setIsCreateModalOpen(false)}>
           <NoteForm 
-            onSuccess={() => {
+            onClose={() => {
               setIsCreateModalOpen(false);
               queryClient.invalidateQueries({ queryKey: ["notes"] });
             }}

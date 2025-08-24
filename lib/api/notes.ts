@@ -1,6 +1,6 @@
 // lib/api/notes.ts
 import axios from "axios";
-import type { Note, NotesResponse } from "@/types/note";
+import type { Note, NotesResponse } from "../../types/note";
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL ?? "https://notehub-public.goit.study/api",
@@ -12,8 +12,11 @@ const api = axios.create({
 
 export async function getNotes(params?: { page?: number; perPage?: number; tag?: string; search?: string }) {
   const { page = 1, perPage = 12, tag, search } = params ?? {};
+  
+  const requestParams = { page, perPage, ...(tag ? { tag } : {}), ...(search ? { search } : {}) };
+  
   const { data } = await api.get<NotesResponse>("/notes", {
-    params: { page, perPage, ...(tag ? { tag } : {}), ...(search ? { search } : {}) },
+    params: requestParams,
   });
   return data;
 }
