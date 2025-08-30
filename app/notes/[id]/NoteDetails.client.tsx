@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
-import { getNoteById } from '@/lib/api/notes';
-import type { Note } from '@/types/note';
+import { getNoteById } from '../../../lib/api/notes';
+import type { Note } from '../../../types/note';
 import css from './NoteDetails.module.css';
 
 type Props = { id: string };

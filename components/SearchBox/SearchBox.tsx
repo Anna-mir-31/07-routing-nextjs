@@ -15,17 +15,21 @@ export default function SearchBox({ placeholder = "Search notes..." }: SearchBox
   useEffect(() => {
     const delayedSearch = setTimeout(() => {
       const params = new URLSearchParams(searchParams.toString());
+      const currentSearch = searchParams.get("search") || "";
       
-      if (search.trim()) {
-        params.set("search", search.trim());
-      } else {
-        params.delete("search");
+      // Only update if search actually changed
+      if (search.trim() !== currentSearch) {
+        if (search.trim()) {
+          params.set("search", search.trim());
+        } else {
+          params.delete("search");
+        }
+        
+        // Reset to first page only when search changes
+        params.set("page", "1");
+        
+        router.push(`?${params.toString()}`);
       }
-      
-      // Reset to first page when searching
-      params.set("page", "1");
-      
-      router.push(`?${params.toString()}`);
     }, 300); // Debounce search
 
     return () => clearTimeout(delayedSearch);

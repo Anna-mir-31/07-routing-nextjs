@@ -21,11 +21,29 @@ export default function Pagination({
     return null;
   }
 
-  const navigateToPage = (page: number) => {
+  const navigateToPage = useCallback((page: number) => {
+    if (page === currentPage) {
+      return;
+    }
+    
     const params = new URLSearchParams(searchParams.toString());
     params.set("page", page.toString());
     const newUrl = `${pathname}?${params.toString()}`;
-    window.location.href = newUrl;
+    
+    console.log('🔄 Pagination navigation:', { 
+      currentPage, 
+      targetPage: page, 
+      pathname, 
+      newUrl,
+      searchParams: searchParams.toString()
+    });
+    
+    router.push(newUrl, { scroll: false });
+  }, [searchParams, pathname, router, currentPage]);
+
+  const handlePageClick = (page: number) => (e: React.MouseEvent) => {
+    e.preventDefault();
+    navigateToPage(page);
   };
 
   const getVisiblePages = () => {
@@ -53,7 +71,7 @@ export default function Pagination({
       {/* Previous button */}
       {currentPage > 1 ? (
         <button
-          onClick={() => navigateToPage(currentPage - 1)}
+          onClick={handlePageClick(currentPage - 1)}
           className={css.pageButton}
           aria-label="Previous page"
         >
@@ -67,7 +85,7 @@ export default function Pagination({
       {visiblePages[0] > 1 && (
         <>
           <button 
-            onClick={() => navigateToPage(1)} 
+            onClick={handlePageClick(1)} 
             className={css.pageButton}
           >
             1
@@ -80,7 +98,7 @@ export default function Pagination({
       {visiblePages.map((page) => (
         <button
           key={page}
-          onClick={() => navigateToPage(page)}
+          onClick={handlePageClick(page)}
           className={`${css.pageButton} ${page === currentPage ? css.active : ""}`}
         >
           {page}
@@ -94,7 +112,7 @@ export default function Pagination({
             <span className={css.info}>...</span>
           )}
           <button 
-            onClick={() => navigateToPage(totalPages)} 
+            onClick={handlePageClick(totalPages)} 
             className={css.pageButton}
           >
             {totalPages}
@@ -105,7 +123,7 @@ export default function Pagination({
       {/* Next button */}
       {currentPage < totalPages ? (
         <button
-          onClick={() => navigateToPage(currentPage + 1)}
+          onClick={handlePageClick(currentPage + 1)}
           className={css.pageButton}
           aria-label="Next page"
         >

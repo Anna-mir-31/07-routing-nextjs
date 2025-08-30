@@ -1,6 +1,6 @@
 "use client";
-import { formatDate } from "@/lib/utils";
-import type { Note } from "@/types/note";
+import { formatDate } from "../../lib/utils";
+import type { Note } from "../../types/note";
 import css from "./NotePreview.module.css";
 
 export default function NotePreview({ note }: { note: Note }) {

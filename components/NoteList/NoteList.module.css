@@ -24,6 +24,7 @@
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 16px;
+  gap: 12px;
 }
 
 .title {
@@ -32,6 +33,13 @@
   color: #212529;
   margin: 0;
   line-height: 1.4;
+  text-decoration: none;
+  flex: 1;
+}
+
+.title:hover {
+  color: #007bff;
+  text-decoration: underline;
 }
 
 .deleteButton {
@@ -80,6 +88,9 @@
 .date {
   font-size: 12px;
   color: #6c757d;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .emptyState {

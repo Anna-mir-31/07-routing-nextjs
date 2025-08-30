@@ -1,7 +1,6 @@
 "use client";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { useState } from "react";
 
 export default function TanStackProvider({
@@ -14,16 +13,22 @@ export default function TanStackProvider({
       new QueryClient({
         defaultOptions: {
           queries: {
-            staleTime: 60 * 1000,
+            staleTime: 0,
+            gcTime: 0,
+            retry: 1,
+            refetchOnWindowFocus: false,
+            refetchOnMount: true,
+            enabled: true,
           },
         },
       })
   );
 
+  console.log('🎯 TanStack Provider initialized with client:', queryClient);
+
   return (
     <QueryClientProvider client={queryClient}>
       {children}
-      <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
 }

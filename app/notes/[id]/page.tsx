@@ -1,8 +1,8 @@
 // app/notes/[id]/page.tsx
 import { notFound } from 'next/navigation';
-import NotePreview from "@/components/NotePreview/NotePreview";
-import { getNoteById } from "@/lib/api/notes";
-import type { Note } from "@/types/note";
+import NotePreview from "../../../components/NotePreview/NotePreview";
+import { getNoteById } from "../../../lib/api/notes";
+import type { Note } from "../../../types/note";
 
 interface NoteDetailsPageProps {
   params: { id: string };
